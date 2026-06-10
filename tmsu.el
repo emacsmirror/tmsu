@@ -59,11 +59,6 @@ the list in a specific way."
 (defvar tmsu-edit-history nil
   "Command history of TMSU edits.")
 
-(defvar tmsu-edit-history-last-added nil
-  "The tags added by the last `tmsu-edit' command.
-
-Stored separately to allow being added to the current command with `M-n'.")
-
 (defvar tmsu-query-history nil
   "Command history of TMSU queries.")
 
@@ -288,10 +283,7 @@ TMSU commands."
                     (tmsu-completion-table-assignment)
                     nil nil
                     (string-join tags-old ",")
-                    'tmsu-edit-history
-                    (string-join (append tags-old
-                                         tmsu-edit-history-last-added)
-                                 ",")))
+                    'tmsu-edit-history))
          (tags-added   (cl-set-difference tags-new tags-old :test #'string=))
          (tags-removed (cl-set-difference tags-old tags-new :test #'string=)))
     (unless (or tags-added
@@ -299,7 +291,6 @@ TMSU commands."
       (user-error "No changes"))
     (apply #'tmsu-tags-remove file tags-removed)
     (apply #'tmsu-tags-add    file tags-added)
-    (setq tmsu-edit-history-last-added tags-added)
     (message "TMSU tags change on `%s': %S: %s"
              file-name
              (tmsu-get-tags file)
